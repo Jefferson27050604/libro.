@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Libro de Fotos</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url('https://images4.imagebam.com/71/ce/96/MEZNS1A_o.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        #container {
+            display: flex;
+            align-items: center;
+        }
+        #book-container {
+            width: 350px;
+            height: 450px;
+            position: relative;
+            perspective: 1200px;
+            cursor: pointer;
+        }
+        .cover, .page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            backface-visibility: hidden;
+            transition: transform 0.8s ease;
+            transform-style: preserve-3d;
+            transform-origin: left;
+        }
+        .cover img, .page img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .cover {
+            z-index: 3;
+            background-color: #fff;
+        }
+        .page.active {
+            z-index: 2;
+        }
+        .page.next {
+            transform: rotateY(-180deg);
+        }
+        .cover::before {
+            content: "Portada";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        .cover.open {
+            transform: rotateY(-180deg);
+        }
+        #nota {
+            width: 500px; /* Agrandado mucho más */
+            height: 650px; /* Agrandado mucho más */
+            margin-left: 40px;
+            background-image: url('https://images4.imagebam.com/b5/45/4a/MEZNXYQ_o.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        #nota.hidden {
+            display: none; /* Ocultar la nota cuando no está en la portada */
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="book-container">
+            <div class="cover"><img src="https://via.placeholder.com/350x450?text=Tapa+del+Libro" alt="Portada"></div>
+            <div class="page active"><img src="https://images4.imagebam.com/8e/22/f3/MEZNRVF_o.jpg" alt="Foto 1"></div>
+            <div class="page"><img src="https://images4.imagebam.com/a7/80/9b/MEZNRBW_o.jpeg" alt="Foto 2"></div>
+            <div class="page"><img src="https://images4.imagebam.com/32/47/4a/MEZNRT3_o.jpg" alt="Foto 3"></div>
+        </div>
+        <div id="nota"></div>
+    </div>
+
+    <script>
+        const container = document.getElementById('book-container');
+        const cover = document.querySelector('.cover');
+        const pages = Array.from(document.querySelectorAll('.page'));
+        const nota = document.getElementById('nota');
+        let currentIndex = 0;
+        let isOpen = false;
+
+        container.addEventListener('click', () => {
+            if (!isOpen) {
+                // Abrir el libro (portada)
+                cover.classList.add('open');
+                setTimeout(() => {
+                    pages[currentIndex].classList.add('active');
+                    nota.classList.add('hidden'); // Ocultar la nota al abrir el libro
+                }, 400); // Ajustar al tiempo de transición CSS
+                isOpen = true;
+            } else {
+                // Cambiar páginas
+                const currentPage = pages[currentIndex];
+                currentPage.classList.remove('active');
+                currentPage.classList.add('next');
+
+                currentIndex = (currentIndex + 1) % pages.length;
+
+                if (currentIndex === 0) {
+                    // Si volvemos a la primera página, cerramos el libro
+                    setTimeout(() => {
+                        pages.forEach(page => page.classList.remove('active', 'next'));
+                        cover.classList.remove('open');
+                        nota.classList.remove('hidden'); // Mostrar la nota al cerrar el libro
+                    }, 800); // Ajusta al tiempo de transición CSS
+                    isOpen = false;
+                    return;
+                }
+
+                const nextPage = pages[currentIndex];
+                nextPage.classList.add('active');
+
+                setTimeout(() => {
+                    currentPage.classList.remove('next');
+                }, 800); // Ajusta al tiempo de transición CSS
+            }
+        });
+    </script>
+</body>
+</html>
